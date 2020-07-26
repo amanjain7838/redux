@@ -67,26 +67,32 @@ function projectReducer(state=[],action)
             return state;
     }
 }
-import {createStore} from 'redux';
+import {createStore,applyMiddleware,compose} from 'redux';
 import {combineReducers} from 'redux';
+import logger from './logger';
+import func from './func';
+
 export const combinereducers=combineReducers({
     bugs:bugsReducer,
     project:projectReducer
 })
-const store =createStore(combinereducers,window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const store =createStore(combinereducers,compose(applyMiddleware(logger,func),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()));
 
 // import store from './store';
 // import * as actions from './actions';
-console.log(store)
+// console.log(store)
 
 store.subscribe(()=>{
     console.log("store updated",store.getState());
 })
-store.dispatch(projectAdded("pr1"))
-store.dispatch(projectAdded("pr2"))
-store.dispatch(bugAdded("bug2",2))
-store.dispatch(bugAdded("bug1",1))
-store.dispatch(bugResolved(1))
+store.dispatch((dispatch,getState)=>{
+    store.dispatch(projectAdded("pr1"))
+    console.log(store.getState())
+})
+// store.dispatch(projectAdded("pr2"))
+// store.dispatch(bugAdded("bug2",2))
+// store.dispatch(bugAdded("bug1",1))
+// store.dispatch(bugResolved(1))
 
 // store.dispatch(actions.bugRemoved(1))
 //selectors
