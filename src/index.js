@@ -3,13 +3,15 @@ const BUG_RESOLVED="bugResolved";
 const BUG_REMOVED="bugRemoved";
 const PROJECT_ADDED="projectAdded";
 
+
+//actions
 const bugAdded=(description,projectid)=>({
     type:BUG_ADDED,
     payload:{
         description,
         projectid
     }
-})
+});
 const projectAdded=description=>({
     type:PROJECT_ADDED,
     payload:{
@@ -28,6 +30,10 @@ const bugRemoved=id=>({
         id
     }
 })
+const apiCallBegan=payload=>({
+    type:'apicallBegan',
+    payload
+});
 let last=0;
 function bugsReducer(state=[],action)
 {
@@ -71,12 +77,13 @@ import {createStore,applyMiddleware,compose} from 'redux';
 import {combineReducers} from 'redux';
 import logger from './logger';
 import func from './func';
+import apimiddleware from './apimiddleware';
 
 export const combinereducers=combineReducers({
     bugs:bugsReducer,
     project:projectReducer
 })
-const store =createStore(combinereducers,compose(applyMiddleware(logger,func),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()));
+const store =createStore(combinereducers,compose(applyMiddleware(logger,func,apimiddleware),window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()));
 
 // import store from './store';
 // import * as actions from './actions';
@@ -89,7 +96,11 @@ store.dispatch((dispatch,getState)=>{
     store.dispatch(projectAdded("pr1"))
     console.log(store.getState())
 })
-// store.dispatch(projectAdded("pr2"))
+//pass onError if any specific error function to handle
+store.dispatch(apiCallBegan({
+        url:'/api/users?page=2',
+        onSuccess:'bugsReceived',
+    }));
 // store.dispatch(bugAdded("bug2",2))
 // store.dispatch(bugAdded("bug1",1))
 // store.dispatch(bugResolved(1))
